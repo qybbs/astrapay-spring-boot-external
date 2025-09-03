@@ -1,0 +1,37 @@
+package com.astrapay.service.impl;
+
+import com.astrapay.dto.request.NoteRequest;
+import com.astrapay.dto.response.NoteResponse;
+import com.astrapay.model.Note;
+import com.astrapay.service.NoteService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+@Service
+public class NoteServiceImpl implements NoteService {
+
+    private final Map<String, Note> notes = new ConcurrentHashMap<>();
+    @Override
+    public NoteResponse addNote(NoteRequest request) {
+        Note note = new Note(request.getContent());
+        notes.put(note.getId(), note);
+        return new NoteResponse(note.getId(), note.getContent());
+    }
+
+    @Override
+    public List<NoteResponse> getAllNotes() {
+        return notes.values().stream()
+                .map(note -> new NoteResponse(note.getId(), note.getContent()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteNote(String id) {
+        if (!notes.containsKey(id)) throw new IllegalArgumentException("Note with id " + id + " not found");
+        notes.remove(id);
+    }
+}
