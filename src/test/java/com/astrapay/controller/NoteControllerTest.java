@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -39,7 +40,9 @@ public class NoteControllerTest {
 
         mockMvc.perform(get(ConstantVariable.NOTE_ENDPOINT))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Notes retrieved successfully"))
+                .andExpect(jsonPath("$.data").isArray());
     }
 
     @Test
@@ -51,10 +54,37 @@ public class NoteControllerTest {
         when(noteService.addNote(any())).thenReturn(new NoteResponse("1", title, content, now, now));
 
         mockMvc.perform(post(ConstantVariable.NOTE_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.content").value(content));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Note created successfully"))
+                .andExpect(jsonPath("$.data.title").value(title))
+                .andExpect(jsonPath("$.data.content").value(content));
+    }
+
+    @Test
+    void testUpdateNote() throws Exception {
+        String noteId = "1";
+        String updatedTitle = "Catatan Diperbarui";
+        String updatedContent = "Ini adalah catatan yang telah diperbarui";
+        Date createdAt = new Date();
+        Date updatedAt = new Date();
+
+        NoteRequest updateRequest = new NoteRequest(updatedTitle, updatedContent);
+        NoteResponse updateResponse = new NoteResponse(noteId, updatedTitle, updatedContent, createdAt, updatedAt);
+
+        when(noteService.updateNote(eq(noteId), any())).thenReturn(updateResponse);
+
+        mockMvc.perform(put(ConstantVariable.NOTE_ENDPOINT + "/" + noteId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Note updated successfully"))
+                .andExpect(jsonPath("$.data.id").value(noteId))
+                .andExpect(jsonPath("$.data.title").value(updatedTitle))
+                .andExpect(jsonPath("$.data.content").value(updatedContent));
     }
 
     @Test

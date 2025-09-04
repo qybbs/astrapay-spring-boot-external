@@ -2,6 +2,7 @@ package com.astrapay.service.impl;
 
 import com.astrapay.dto.request.NoteRequest;
 import com.astrapay.dto.response.NoteResponse;
+import com.astrapay.exception.NoteNotFoundException;
 import com.astrapay.model.Note;
 import com.astrapay.service.NoteService;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteResponse updateNote(String id, NoteRequest request) {
         if (!notes.containsKey(id)) {
-            throw new IllegalArgumentException("Note with id " + id + " not found");
+            throw new NoteNotFoundException(id);
         }
 
         Note note = notes.get(id);
@@ -67,7 +68,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public void deleteNote(String id) {
-        if (!notes.containsKey(id)) throw new IllegalArgumentException("Note with id " + id + " not found");
+        if (!notes.containsKey(id)) throw new NoteNotFoundException(id);
         notes.remove(id);
     }
 }

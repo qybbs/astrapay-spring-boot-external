@@ -2,6 +2,7 @@ package com.astrapay.service;
 
 import com.astrapay.dto.request.NoteRequest;
 import com.astrapay.dto.response.NoteResponse;
+import com.astrapay.exception.NoteNotFoundException;
 import com.astrapay.service.impl.NoteServiceImpl;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,37 @@ public class NoteServiceImplTest {
     }
 
     @Test
+    void testUpdateNote() {
+        // Add a note first
+        String originalTitle = "Judul Asli";
+        String originalContent = "Konten asli";
+        NoteRequest addRequest = new NoteRequest(originalTitle, originalContent);
+        NoteResponse addedNote = noteService.addNote(addRequest);
+
+        // Update the note
+        String updatedTitle = "Judul Diperbarui";
+        String updatedContent = "Konten telah diperbarui";
+        NoteRequest updateRequest = new NoteRequest(updatedTitle, updatedContent);
+        NoteResponse updatedNote = noteService.updateNote(addedNote.getId(), updateRequest);
+
+        // Verify the update
+        assertNotNull(updatedNote);
+        assertEquals(addedNote.getId(), updatedNote.getId());
+        assertEquals(updatedTitle, updatedNote.getTitle());
+        assertEquals(updatedContent, updatedNote.getContent());
+        assertEquals(addedNote.getCreatedAt(), updatedNote.getCreatedAt()); // CreatedAt should remain the same
+        assertTrue(updatedNote.getUpdatedAt().after(addedNote.getCreatedAt()) ||
+                updatedNote.getUpdatedAt().equals(addedNote.getCreatedAt())); // UpdatedAt should be newer or equal
+    }
+
+    @Test
+    void testUpdateNonExistingNoteThrowsException() {
+        NoteRequest updateRequest = new NoteRequest("Judul", "Konten");
+        assertThrows(NoteNotFoundException.class, () ->
+                noteService.updateNote("non-existing-id", updateRequest));
+    }
+
+    @Test
     void testDeleteNote() {
         NoteResponse response = noteService.addNote(new NoteRequest("Catatan terhapus","Ini adalah catatan yang akan terhapus"));
         noteService.deleteNote(response.getId());
@@ -47,6 +79,6 @@ public class NoteServiceImplTest {
 
     @Test
     void testDeleteNonExistingNoteThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> noteService.deleteNote("invalid-id"));
+        assertThrows(NoteNotFoundException.class, () -> noteService.deleteNote("invalid-id"));
     }
 }

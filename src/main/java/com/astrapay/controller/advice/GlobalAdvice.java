@@ -1,6 +1,7 @@
 package com.astrapay.controller.advice;
 
-import com.astrapay.dto.response.ErrorResponse;
+import com.astrapay.dto.response.BaseResponse;
+import com.astrapay.exception.NoteNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,33 +12,35 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                errorMessage
+    public ResponseEntity<BaseResponse<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return new ResponseEntity<>(
+                new BaseResponse<>(
+                        false,
+                        ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+                ),
+                HttpStatus.BAD_REQUEST
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage()
+    @ExceptionHandler(NoteNotFoundException.class)
+    public ResponseEntity<BaseResponse<String>> handleNoteNotFound(NoteNotFoundException ex) {
+        return new ResponseEntity<>(
+                new BaseResponse<>(
+                        false,
+                        ex.getMessage()
+                ),
+                HttpStatus.NOT_FOUND
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                ex.getMessage()
+    public ResponseEntity<BaseResponse<String>> handleGeneric(Exception ex) {
+        return new ResponseEntity<>(
+                new BaseResponse<>(
+                        false,
+                        ex.getMessage()
+                ),
+                HttpStatus.INTERNAL_SERVER_ERROR
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

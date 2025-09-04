@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NoteController.class)
@@ -36,8 +36,32 @@ public class NoteControllerValidationTest {
         mockMvc.perform(post(ConstantVariable.NOTE_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testUpdateNoteValidationError() throws Exception {
+        String noteId = "1";
+        NoteRequest invalidRequest = new NoteRequest("", "");
+
+        mockMvc.perform(put(ConstantVariable.NOTE_ENDPOINT + "/" + noteId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testUpdateNoteNotFound() throws Exception {
+        String nonExistentId = "999";
+        NoteRequest validRequest = new NoteRequest("Valid Title", "Valid Content");
+
+        doThrow(new IllegalArgumentException("Note with id " + nonExistentId + " not found"))
+                .when(noteService).updateNote(eq(nonExistentId), any());
+
+        mockMvc.perform(put(ConstantVariable.NOTE_ENDPOINT + "/" + nonExistentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequest)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -46,7 +70,6 @@ public class NoteControllerValidationTest {
                 .when(noteService).deleteNote("999");
 
         mockMvc.perform(delete(ConstantVariable.NOTE_ENDPOINT + "/999"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value(HttpStatus.NOT_FOUND.getReasonPhrase()));
+                .andExpect(status().isNotFound());
     }
 }

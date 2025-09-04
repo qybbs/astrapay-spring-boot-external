@@ -1,6 +1,5 @@
 package com.astrapay.controller;
 
-import com.astrapay.constant.ConstantVariable;
 import com.astrapay.dto.request.NoteRequest;
 import com.astrapay.dto.response.BaseResponse;
 import com.astrapay.dto.response.NoteResponse;
@@ -17,8 +16,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
-@RequestMapping(ConstantVariable.NOTE_ENDPOINT)
+@CrossOrigin(origins = "${app.cors.allowed-origins}")
+@RequestMapping("/api/v1/notes")
 @Api(tags = "Notes API")
 public class NoteController {
 
