@@ -119,6 +119,45 @@ mvn test -Dtest=NoteControllerValidationTest
 - **Integration Tests**: Full application workflow
 - **Validation Tests**: Input validation and error handling
 
+## 📸 API Examples with Screenshots
+
+### ✅ Create Note - Success
+Successfully creating a new note with valid title and content:
+
+![Add Note Success](screenshot/screenshot-add-note-success.png)
+
+### ❌ Create Note - Validation Errors
+
+#### Missing Title
+Attempting to create a note with empty title:
+
+![Add Note Failed - Title](screenshot/screenshot-add-note-failed-title.png)
+
+#### Missing Content
+Attempting to create a note with empty content:
+
+![Add Note Failed - Content](screenshot/screenshot-add-note-failed-content.png)
+
+### ✅ Update Note - Success
+Successfully updating an existing note:
+
+![Update Note Success](screenshot/screenshot-update-note-success.png)
+
+### ❌ Update Note - Not Found
+Attempting to update a non-existent note:
+
+![Update Note Failed - Not Found](screenshot/screenshot-update-note-failed-not-found.png)
+
+### ✅ Delete Note - Success
+Successfully deleting an existing note:
+
+![Delete Note Success](screenshot/screenshot-delete-note-success.png)
+
+### ❌ Delete Note - Not Found
+Attempting to delete a non-existent note:
+
+![Delete Note Failed - Not Found](screenshot/screenshot-delete-note-failed-not-found.png)
+
 ## 📋 Example Usage
 
 ### Using cURL
