@@ -15,18 +15,20 @@ public class NoteServiceImplTest {
 
     @Test
     void testAddNote() {
+        String title = "Ketentuan";
         String content = "Aplikasi ini tidak memerlukan database; data akan disimpan secara sementara di memori aplikasi.";
-        NoteRequest request = new NoteRequest(content);
+        NoteRequest request = new NoteRequest(title, content);
         NoteResponse response = noteService.addNote(request);
 
         assertNotNull(response.getId());
+        assertEquals(title, response.getTitle());
         assertEquals(content, response.getContent());
     }
 
     @Test
     void testGetAllNotes() {
-        noteService.addNote(new NoteRequest("Catatan 1"));
-        noteService.addNote(new NoteRequest("Catatan 2"));
+        noteService.addNote(new NoteRequest("Catatan 1", "Ini adalah catatan 1"));
+        noteService.addNote(new NoteRequest("Catatan 2", "Ini adalah catatan 2"));
 
         List<NoteResponse> notes = noteService.getAllNotes();
         assertTrue(notes.size() >= 2);
@@ -34,7 +36,7 @@ public class NoteServiceImplTest {
 
     @Test
     void testDeleteNote() {
-        NoteResponse response = noteService.addNote(new NoteRequest("Catatan yang akan terhapus"));
+        NoteResponse response = noteService.addNote(new NoteRequest("Catatan terhapus","Ini adalah catatan yang akan terhapus"));
         noteService.deleteNote(response.getId());
 
         List<NoteResponse> notes = noteService.getAllNotes();

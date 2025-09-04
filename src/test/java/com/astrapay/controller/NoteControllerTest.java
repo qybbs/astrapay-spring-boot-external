@@ -1,5 +1,6 @@
 package com.astrapay.controller;
 
+import com.astrapay.constant.ConstantVariable;
 import com.astrapay.dto.request.NoteRequest;
 import com.astrapay.dto.response.NoteResponse;
 import com.astrapay.service.NoteService;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -31,24 +33,24 @@ public class NoteControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final String noteEndpoint = "/api/v1/notes";
-
     @Test
     void testGetAllNotes() throws Exception {
         when(noteService.getAllNotes()).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get(noteEndpoint))
+        mockMvc.perform(get(ConstantVariable.NOTE_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }
 
     @Test
     void testAddNote() throws Exception {
-        String content = "Catatan Baru";
-        NoteRequest request = new NoteRequest(content);
-        when(noteService.addNote(any())).thenReturn(new NoteResponse("1", content));
+        String title = "Catatan Baru";
+        String content = "Ini adalah catatan baru";
+        Date now = new Date();
+        NoteRequest request = new NoteRequest(title, content);
+        when(noteService.addNote(any())).thenReturn(new NoteResponse("1", title, content, now, now));
 
-        mockMvc.perform(post(noteEndpoint)
+        mockMvc.perform(post(ConstantVariable.NOTE_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -59,7 +61,7 @@ public class NoteControllerTest {
     void testDeleteNote() throws Exception {
         doNothing().when(noteService).deleteNote("1");
 
-        mockMvc.perform(delete(noteEndpoint + "/1"))
+        mockMvc.perform(delete(ConstantVariable.NOTE_ENDPOINT + "/1"))
                 .andExpect(status().isOk());
     }
 }

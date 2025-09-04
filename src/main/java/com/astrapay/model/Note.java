@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -18,13 +19,34 @@ public class Note {
     private String id;
 
     @ApiModelProperty(
-            value = "Content of the note",
+            value = "Title of the note",
             example = "Hiring Project Challenge: Product Developer"
+    )
+    private String title;
+
+    @ApiModelProperty(
+            value = "Content of the note",
+            example = "Simple Notes Application"
     )
     private String content;
 
-    public Note(String content) {
+    @ApiModelProperty(
+            value = "Timestamp of note creation",
+            example = "04-09-2025"
+    )
+    private Date createdAt;
+
+    @ApiModelProperty(
+            value = "Timestamp of note updation",
+            example = "04-09-2025"
+    )
+    private Date updatedAt;
+
+    public Note(String title, String content) {
         this.id = UUID.randomUUID().toString();
+        this.title = title;
         this.content = content;
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
     }
 }

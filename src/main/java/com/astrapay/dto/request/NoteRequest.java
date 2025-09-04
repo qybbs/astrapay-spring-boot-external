@@ -15,9 +15,17 @@ import javax.validation.constraints.NotBlank;
 public class NoteRequest {
     @NotBlank(message = "Content must not be empty")
     @ApiModelProperty(
+            value = "Title of the note",
+            required = true,
+            example = "Proyek Catatan Simpel"
+    )
+    private String title;
+    @ApiModelProperty(
             value = "Content of the note",
             required = true,
             example = "Proyek ini bertujuan untuk mengukur kemampuan Anda..."
     )
     private String content;
 }
+
+
